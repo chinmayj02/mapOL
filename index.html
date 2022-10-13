@@ -13,7 +13,7 @@
     .map {
       margin: 0 auto;
       width: 75%;
-      height: 50%;
+      height: 75%;
     }
 
     button {
@@ -35,52 +35,52 @@
       collapsible: false
     });
 
-    var map = new ol.Map({
-      controls: ol.control.defaults({ attribution: false }).extend([attribution]),
-      layers: [
-        new ol.layer.Tile({
-          source: new ol.source.OSM({
-            url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            maxZoom: 18
-          })
-        })
-      ],
-      target: 'map',
-      view: new ol.View({
-        center: ol.proj.fromLonLat([79.566427, 22.883021]),
-        maxZoom: 18,
-        zoom: 1
-      })
+    var view = new ol.View({
+      center: ol.proj.fromLonLat([0, 0]),
+      maxZoom: 8,
+      zoom: 2
+    });
+
+    const source = new ol.source.OSM({
+      url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     });
 
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showLoc, err);
-      }
-   
-      function showLoc(position) {
+      navigator.geolocation.getCurrentPosition(showLoc, err);
+    }
+
+    function showLoc(position) {
       latitude = position.coords.latitude;
       longitude = position.coords.longitude;
 
       console.log(latitude, longitude);
-
-      var layer = new ol.layer.Vector({
-        source: new ol.source.Vector({
-          features: [
-            new ol.Feature({
-              geometry: new ol.geom.Point(ol.proj.fromLonLat([longitude,latitude])),
-              
-            })
-          ]
-        }),
-        view: new ol.View({
-        // center: ol.proj.fromLonLat([79.566427, 22.883021]),
-        // maxZoom: 18,
-        zoom: 10
+      var source1 = new ol.source.Vector({
+        features: [
+          new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.fromLonLat([longitude, latitude])),
+          })
+        ]
       })
+      var layer = new ol.layer.Vector({
+        source: source1
       });
       map.addLayer(layer);
-  
+      view.setCenter(ol.proj.fromLonLat([longitude, latitude]));
+      view.animate({ zoom: view.getZoom() + 8 });
     }
+
+
+    var map = new ol.Map({
+      controls: ol.control.defaults({ attribution: false }).extend([attribution]),
+      layers: [
+        new ol.layer.Tile({
+          source: source
+        })
+      ],
+      target: 'map',
+      view: view
+    });
+
     function err(error) {
       if (error.code == 1) {
         alert("Something went wrong/ Permission Not Granted");
@@ -92,10 +92,10 @@
         alert("Timeout Error");
       }
     }
-   
+
     button.addEventListener("click", () => {
-        window.location.reload();
-      }
+      window.location.reload();
+    }
     );
   </script>
 </body>
