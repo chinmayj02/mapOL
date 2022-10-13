@@ -68,12 +68,17 @@
           features: [
             new ol.Feature({
               geometry: new ol.geom.Point(ol.proj.fromLonLat([longitude,latitude])),
-              zoom: 7
+              
             })
           ]
         })
+        
       });
       map.addLayer(layer);
+      const view = new View({
+  center: [longitude,latitude],
+  zoom: 7,
+});
     }
     function err(error) {
       if (error.code == 1) {
